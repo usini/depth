@@ -14,12 +14,12 @@ function initI18n() {
         langSelect.appendChild(option);
     });
     langSelect.value = i18n.getLang();
-    
+
     // Handle language change
     langSelect.addEventListener('change', (e) => {
         i18n.setLang(e.target.value);
     });
-    
+
     // Listen for language changes to update dynamic buttons
     i18n.onLangChange(() => {
         refreshDisplayButtons();
@@ -29,7 +29,7 @@ function initI18n() {
             setStatus('statusRunning', { interval: captureIntervalMs });
         }
     });
-    
+
     // Initial DOM update
     i18n.updateDOM();
 }
@@ -63,10 +63,10 @@ const depthNumber = document.getElementById('depthNumber');
 const depthValueSpan = document.getElementById('depthValue');
 const toggleGoldBtn = document.getElementById('toggleGold');
 
-// État d'affichage
+// Gold texture tint
 let useGoldTint = true;
 
-function refreshDisplayButtons(){
+function refreshDisplayButtons() {
     if (toggleGoldBtn)
         toggleGoldBtn.textContent = i18n.t(useGoldTint ? 'toggleGoldOff' : 'toggleGoldOn');
 }
@@ -75,13 +75,13 @@ let captureStream = null;
 let captureVideo = null;
 let captureTimer = null;
 
-// Persistance des paramètres
+// Persist settings
 function loadSettings() {
     const savedDepth = localStorage.getItem('depthmap-depth');
     const savedInterval = localStorage.getItem('depthmap-interval');
     if (savedDepth !== null) depthScale = parseFloat(savedDepth);
     if (savedInterval !== null) captureIntervalMs = parseInt(savedInterval, 10);
-    // Mettre à jour les inputs
+    // Update inputs
     if (depthRange) depthRange.value = depthScale.toString();
     if (depthNumber) depthNumber.value = depthScale.toString();
     if (intervalInput) intervalInput.value = captureIntervalMs.toString();
@@ -91,15 +91,15 @@ function saveInterval() { localStorage.setItem('depthmap-interval', captureInter
 
 let captureIntervalMs = 200;
 loadSettings();
-function syncDepthDisplays(){
+function syncDepthDisplays() {
     const txt = depthScale.toFixed(2);
-    if(depthValueSpan) depthValueSpan.textContent = txt;
-    if(depthRange && document.activeElement!==depthRange) depthRange.value = depthScale.toString();
-    if(depthNumber && document.activeElement!==depthNumber) depthNumber.value = depthScale.toString();
+    if (depthValueSpan) depthValueSpan.textContent = txt;
+    if (depthRange && document.activeElement !== depthRange) depthRange.value = depthScale.toString();
+    if (depthNumber && document.activeElement !== depthNumber) depthNumber.value = depthScale.toString();
 }
 
-depthRange?.addEventListener('input', e=>{ depthScale=parseFloat(e.target.value)||0; if(mesh?.material?.uniforms?.depthScale) mesh.material.uniforms.depthScale.value=depthScale; syncDepthDisplays(); saveDepth(); });
-depthNumber?.addEventListener('input', e=>{ depthScale=parseFloat(e.target.value)||0; if(mesh?.material?.uniforms?.depthScale) mesh.material.uniforms.depthScale.value=depthScale; syncDepthDisplays(); saveDepth(); });
+depthRange?.addEventListener('input', e => { depthScale = parseFloat(e.target.value) || 0; if (mesh?.material?.uniforms?.depthScale) mesh.material.uniforms.depthScale.value = depthScale; syncDepthDisplays(); saveDepth(); });
+depthNumber?.addEventListener('input', e => { depthScale = parseFloat(e.target.value) || 0; if (mesh?.material?.uniforms?.depthScale) mesh.material.uniforms.depthScale.value = depthScale; syncDepthDisplays(); saveDepth(); });
 
 syncDepthDisplays();
 
@@ -107,7 +107,7 @@ intervalInput?.addEventListener('change', () => {
     const v = Math.max(100, parseInt(intervalInput.value || '200', 10));
     captureIntervalMs = v;
     saveInterval();
-    // si déjà en cours, on redémarre le timer
+    // Restart timer if running
     if (captureTimer) {
         clearInterval(captureTimer);
         captureTimer = setInterval(captureFrameToImage, captureIntervalMs);
@@ -127,7 +127,7 @@ oneShotBtn?.addEventListener('click', async () => {
     await startScreenCapture(true);
 });
 
-toggleGoldBtn?.addEventListener('click', ()=>{
+toggleGoldBtn?.addEventListener('click', () => {
     useGoldTint = !useGoldTint;
     if (mesh?.material?.uniforms?.useGoldTint) {
         mesh.material.uniforms.useGoldTint.value = useGoldTint ? 1 : 0;
@@ -141,27 +141,27 @@ let pipVideo = null;
 let pipStream = null;
 
 async function togglePictureInPicture() {
-    // Vérifier le support PiP
+    // check PiP support
     if (!document.pictureInPictureEnabled) {
         console.warn('[PiP] Picture-in-Picture non supporté par ce navigateur');
         alert('Picture-in-Picture non supporté par ce navigateur');
         return;
     }
 
-    // Si déjà en PiP, on quitte
+    // If Pip is already active, exit it
     if (document.pictureInPictureElement) {
         await document.exitPictureInPicture();
         return;
     }
 
     try {
-        // Créer le stream depuis le canvas si pas encore fait
+        // Create stream from renderer if not already done
         if (!pipStream) {
             const canvas = renderer.domElement;
             pipStream = canvas.captureStream(30); // 30 fps
         }
 
-        // Créer l'élément vidéo si pas encore fait
+        // Create hidden video element if not already done
         if (!pipVideo) {
             pipVideo = document.createElement('video');
             pipVideo.srcObject = pipStream;
@@ -172,7 +172,7 @@ async function togglePictureInPicture() {
             await pipVideo.play();
         }
 
-        // Activer PiP
+        // Enable PiP
         await pipVideo.requestPictureInPicture();
         updatePiPButton();
     } catch (err) {
@@ -189,7 +189,7 @@ function updatePiPButton() {
 
 togglePiPBtn?.addEventListener('click', togglePictureInPicture);
 
-// Écouter les changements d'état PiP
+// Listen to PiP events to update button state
 document.addEventListener('leavepictureinpicture', updatePiPButton);
 document.addEventListener('enterpictureinpicture', updatePiPButton);
 
@@ -199,12 +199,12 @@ function setStatus(key, params = {}) {
 
 async function startScreenCapture(oneShot = false) {
     try {
-        // Si déjà actif et on veut juste oneShot, pas besoin de redemander la permission.
+        // If already active and we just want oneShot, no need to request permission again.
         if (!captureStream) {
-            // Conseils: Microsoft Edge/Chrome demanderont à choisir l'écran/fenêtre/onglet.
+            // Tips: Microsoft Edge/Chrome will ask to choose screen/window/tab.
             captureStream = await navigator.mediaDevices.getDisplayMedia({
                 video: {
-                    displaySurface: 'monitor' // hint, pas toujours pris en compte
+                    displaySurface: 'monitor' // hint, not always respected
                 },
                 audio: false
             });
@@ -214,7 +214,7 @@ async function startScreenCapture(oneShot = false) {
             captureVideo.playsInline = true;
             await captureVideo.play();
 
-            // Si l'utilisateur arrête du sélecteur système
+            // Handle the case where the user stops the capture from browser UI
             const [track] = captureStream.getVideoTracks();
             track.addEventListener('ended', () => {
                 stopScreenCapture();
@@ -224,7 +224,7 @@ async function startScreenCapture(oneShot = false) {
         if (oneShot) {
             await captureFrameToImage();
             setStatus('statusOneShotDone');
-            // on ne stoppe pas le stream pour permettre d'autres one-shot, mais on pourrait si souhaité
+            // If oneShot, we stop immediately after
             return;
         }
 
@@ -252,12 +252,12 @@ function stopScreenCapture() {
 
 async function captureFrameToImage() {
     if (!captureVideo) return;
-    // Dessine la frame vidéo dans un canvas, puis passe l'image au pipeline create3DObject
+    // Draw the video frame into a canvas, then pass the image to the create3DObject pipeline
     const vw = captureVideo.videoWidth;
     const vh = captureVideo.videoHeight;
     if (!vw || !vh) return;
 
-    // Utilise la résolution native capturée (pas de downscale)
+    // Use the native captured resolution (no downscale)
     const cw = vw;
     const ch = vh;
 
@@ -267,7 +267,7 @@ async function captureFrameToImage() {
     canvas.height = ch;
     ctx.drawImage(captureVideo, 0, 0, cw, ch);
 
-    // Convertir en image pour réutiliser create3DObject existant
+    // Convert to image to reuse existing create3DObject
     const img = new Image();
     img.onload = () => create3DObject(img);
     img.src = canvas.toDataURL('image/png');
@@ -276,9 +276,9 @@ async function captureFrameToImage() {
 function handleFileUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             create3DObject(img);
         };
         img.src = e.target.result;
@@ -286,11 +286,11 @@ function handleFileUpload(event) {
     reader.readAsDataURL(file);
 }
 
-// Displacement géré côté GPU (vertex shader) – plus de modification CPU de la géométrie.
+// Displacement handled on GPU side (vertex shader) – no more CPU geometry modification.
 
-// Ajoute un fond uni sous les parties non transparentes
+// Adds a solid background under non-transparent parts
 function createBackgroundMesh(planeWidth, planeHeight) {
-    // Plan légèrement plus grand, derrière le mesh principal
+    // Slightly larger plane, behind the main mesh
     const geometry = new THREE.PlaneGeometry(planeWidth * 1.02, planeHeight * 1.02, 1, 1);
     geometry.translate(0, 0, -0.3);
     const material = new THREE.MeshBasicMaterial({
@@ -305,19 +305,19 @@ function create3DObject(image) {
     const width = image.width;
     const height = image.height;
 
-    // Conserver le ratio de l'image (pas carré)
-    const baseHeight = 10; // taille de référence dans la scène
+    // Preserve the image aspect ratio (not square)
+    const baseHeight = 10; // reference size in the scene
     const planeHeight = baseHeight;
     const planeWidth = baseHeight * (width / height);
 
-    // Si même résolution -> on garde la géométrie et on met à jour uniquement la texture
+    // If same resolution -> keep geometry and update only the texture
     if (mesh && lastWidth === width && lastHeight === height) {
         console.time('[depthmap] updateTexture');
         depthMapTexture.image = image;
         depthMapTexture.needsUpdate = true;
-        // Met à jour texelSize si existant (au cas où)
+        // Update texelSize if existing (just in case)
         if (mesh.material.uniforms && mesh.material.uniforms.texelSize) {
-            mesh.material.uniforms.texelSize.value.set(1/width, 1/height);
+            mesh.material.uniforms.texelSize.value.set(1 / width, 1 / height);
         }
         console.timeEnd('[depthmap] updateTexture');
         lastImage = image;
@@ -325,7 +325,7 @@ function create3DObject(image) {
         return;
     }
 
-    // Sinon on recrée tout (nouvelle résolution potentielle)
+    // Otherwise recreate everything (potentially new resolution)
     if (mesh) {
         scene.remove(mesh);
         mesh.geometry.dispose();
@@ -342,7 +342,7 @@ function create3DObject(image) {
     depthMapTexture = new THREE.Texture(image);
     depthMapTexture.needsUpdate = true;
 
-    // Géométrie subdivisée (1 vertex par pixel)
+    // Subdivided geometry (1 vertex per pixel)
     const segX = Math.max(1, width - 1);
     const segY = Math.max(1, height - 1);
     console.time('[depthmap] geometry build');
@@ -354,7 +354,7 @@ function create3DObject(image) {
         depthScale: { value: depthScale },
         color: { value: new THREE.Color(0xffd700) },
         alphaThreshold: { value: 0.04 },
-        texelSize: { value: new THREE.Vector2(1/width, 1/height) },
+        texelSize: { value: new THREE.Vector2(1 / width, 1 / height) },
         useGoldTint: { value: useGoldTint ? 1 : 0 }
     };
 
@@ -369,7 +369,7 @@ function create3DObject(image) {
     mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // Fond (optionnel) – on peut le laisser, ou le désactiver si performance insuffisante
+    // Background (optional) – can keep it, or disable if performance is insufficient
     bgMesh = createBackgroundMesh(planeWidth, planeHeight);
     scene.add(bgMesh);
 
@@ -409,9 +409,9 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// (Synchronisation profondeur gérée plus haut)
+// (Depth synchronization handled above)
 
-// Fond très clair
+// Very light background
 scene.background = new THREE.Color(0xeeeecc);
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -420,18 +420,18 @@ window.addEventListener('DOMContentLoaded', () => {
     refreshDisplayButtons();
 
     const img = new Image();
-    img.onload = function() {
+    img.onload = function () {
         create3DObject(img);
     };
-    img.onerror = function() {
-        alert("Impossible de charger scorpion_final.jpg. Vérifie le chemin et le nom du fichier !");
+    img.onerror = function () {
+        alert("Unable to load scorpion_final.jpg. Check the file path and name!");
     };
     img.src = './scorpion_final.png';
 });
 
-// === Bouton pour afficher/masquer tout le menu ===
+// === Button to show/hide the entire menu ===
 function setupMenuCollapse() {
-    // Tous les conteneurs de menu/UI possibles (+ option data-menu-root)
+    // All possible menu/UI containers (+ data-menu-root option)
     const hideSelectors = [
         '[data-menu-root]',
         '#menu', '#controls', '#ui', '#panel', '#sidebar',
@@ -439,7 +439,7 @@ function setupMenuCollapse() {
         'header', 'aside', 'nav'
     ];
 
-    // Injecte un style qui cache l’UI quand body a la classe menu-collapsed
+    // Inject a style that hides the UI when the body has the menu-collapsed class
     const styleEl = document.createElement('style');
     styleEl.textContent = `
     body.menu-collapsed ${hideSelectors.join(', body.menu-collapsed ')} { display: none !important; }
@@ -453,7 +453,7 @@ function setupMenuCollapse() {
     `;
     document.head.appendChild(styleEl);
 
-    // S’il n’y a aucun candidat dans le DOM, on ne crée pas le bouton
+    // If there is no candidate in the DOM, do not create the button
     const hasAnyUi = hideSelectors.some(sel => document.querySelector(sel));
     if (!hasAnyUi) return;
 
