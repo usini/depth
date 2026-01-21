@@ -8,9 +8,6 @@ No installation required!
 
 https://github.com/user-attachments/assets/5b3162d5-6978-4fef-966f-f2e33e9603df
 
-Support Picture In Picture preview for always on top 3D preview in any application
-![docs/pip_support.png](docs/pip_support.png)
-
 ## Features
 
 - **Image Loading**: Load local depth map images (PNG, JPG, etc.)
