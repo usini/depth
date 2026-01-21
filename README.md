@@ -1,6 +1,15 @@
-# Depth Map 3D Viewer
+![logo](docs/logo.png)
+# µsini Depth Map Real Time 3D Viewer
 
-A real-time 3D depth map visualization tool built with Three.js. Load depth map images or capture your screen to create interactive 3D relief visualizations.
+# Use it here : https://usini.github.io/depth/
+
+A real-time 3D depth map visualization tool built with Three.js. Load depth map images or capture your screen to create interactive 3D relief visualizations.   
+No installation required!
+
+![docs/preview.mp4](docs/preview.mp4)
+
+Support Picture In Picture preview for always on top 3D preview in any application
+![docs/pip_support.png](docs/pip_support.png)
 
 ## Features
 
@@ -11,13 +20,6 @@ A real-time 3D depth map visualization tool built with Three.js. Load depth map 
 - **Gold Filter**: Optional gold tint overlay for aesthetic effect
 - **Persistent Settings**: Depth and capture interval settings are saved between sessions
 - **Multi-language Support**: English and French included, easy to add more
-
-## Quick Start
-
-1. Open `index.html` in a modern web browser (Chrome, Edge, Firefox)
-2. Load a depth map image using the "Local image" file picker
-3. Adjust the depth slider to control the relief intensity
-4. Use orbit controls (mouse drag) to rotate and zoom the 3D view
 
 ## Screen Capture
 
@@ -84,4 +86,5 @@ Requires a modern browser with:
 This application was partly built using GPT4.1 and Claude Opus 4.5
 
 ## License
+Made by [µsini](https://usini.eu)   
 MIT License
