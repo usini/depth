@@ -6,7 +6,7 @@
 A real-time 3D depth map visualization tool built with Three.js. Load depth map images or capture your screen to create interactive 3D relief visualizations.   
 No installation required!
 
-![docs/preview.mp4](docs/preview.mp4)
+https://github.com/user-attachments/assets/5b3162d5-6978-4fef-966f-f2e33e9603df
 
 Support Picture In Picture preview for always on top 3D preview in any application
 ![docs/pip_support.png](docs/pip_support.png)
