@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/"
+  }
+}
+</script>
+<title>µsini Depthmap 3D Viewer</title>
+</head>
+
+<body>
+  <div id="controls" data-menu-root>
+    <div id="controlPanel">
+      <h1><a target="_blank" rel="noopener noreferrer" href="https://usini.eu">µsini Depth Map</a></h1>
+      
+      <!-- Language selector -->
+      <div class="field">
+        <label data-i18n="languageLabel">Language</label>
+        <select id="langSelect"></select>
+      </div>
+      
+      <hr class="sep" />
+      
+      <div class="field">
+        <label for="upload" data-i18n="uploadLabel">Local image</label>
+        <input type="file" id="upload" accept="image/*" data-i18n-title="uploadTitle">
+      </div>
+      <div class="field">
+        <label for="depthRange"><span data-i18n="depthLabel">Depth</span> <span class="tiny" id="depthValue">0.50</span></label>
+        <input type="range" id="depthRange" min="0" max="5" step="0.01" value="0.5" data-i18n-title="depthSliderTitle">
+        <input type="number" id="depthNumber" min="0" max="5" step="0.01" value="0.5" data-i18n-title="depthNumberTitle">
+      </div>
+      <div class="field">
+        <label for="intervalInput" data-i18n="intervalLabel">Capture interval (ms)</label>
+        <input type="number" id="intervalInput" min="200" step="200" value="200" data-i18n-title="intervalTitle">
+      </div>
+
+      <!-- Display block -->
+      <div class="field">
+        <label data-i18n="displayLabel">Display</label>
+        <div class="buttons" style="gap:6px">
+          <button id="toggleGold" class="secondary" type="button" data-i18n-title="toggleGoldTitle" data-i18n="toggleGoldOff">No gold filter</button>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="pipLabel">Picture-in-Picture</label>
+        <div class="buttons" style="gap:6px">
+          <button id="togglePiP" class="secondary" type="button" data-i18n-title="pipTitle" data-i18n="pipEnable">Enable PiP</button>
+        </div>
+      </div>
+      <hr class="sep" />
+      <div class="buttons">
+        <button id="startCapture" data-i18n-title="startCaptureTitle" data-i18n="startCapture">Start</button>
+        <button id="oneShot" class="secondary" data-i18n-title="oneShotTitle" data-i18n="oneShot">Single Capture</button>
+        <button id="stopCapture" class="danger" data-i18n-title="stopCaptureTitle" data-i18n="stopCapture">Stop</button>
+      </div>
+      <div class="field">
+        <label data-i18n="statusLabel">Status</label>
+        <span id="captureStatus" data-i18n="statusStopped">Stopped</span>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+
+</html>
